@@ -284,19 +284,6 @@
             });
         }
 
-        function createParticles(letter) {
-            for (let i = 0; i < 20; i++) {
-                const particle = document.createElement('div');
-                particle.className = 'particle';
-                particle.style.backgroundColor = `hsl(${Math.random() * 360}, 100%, 70%)`;
-                particle.style.left = letter.offsetLeft + Math.random() * 50 + 'px';
-                particle.style.top = letter.offsetTop + Math.random() * 50 + 'px';
-                gameContainer.appendChild(particle);
-
-                setTimeout(() => particle.remove(), 1000); // Eliminar partículas después de un tiempo
-            }
-        }
-
         function nextLevel() {
             level++;
             levelDiv.textContent = `Nivel: ${level}`;
