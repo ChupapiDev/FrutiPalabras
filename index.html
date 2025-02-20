@@ -178,8 +178,8 @@
         <div class="score-board" id="scoreBoard">Puntaje: 0</div>
         <div class="level" id="level">Nivel: 1</div>
         <div class="menu" id="menu">
-            <div>¡Bienvenido al Juego de Amor!</div>
-            <button id="startBtn">Iniciar Juego</button>
+            <div>¡Bienvenida mi Amor!</div>
+            <button id="startBtn">Empezar</button>
         </div>
         <div class="target-phrase" id="targetPhrase"></div>
         <div class="player" id="player"></div>
@@ -273,7 +273,10 @@
                             nextLevel();
                         }
                     } else {
+                        // Mostrar mensaje de error
                         showMessage('¡Oh no! Intenta de nuevo ❤️', false);
+                        
+                        // Eliminar letra y reiniciar estado de letras
                         letter.remove();
                         letters.splice(index, 1);
                     }
@@ -314,6 +317,13 @@
             msg.textContent = text;
             gameContainer.appendChild(msg);
             setTimeout(() => msg.remove(), 2000);
+
+            // Después de mostrar el mensaje, actualizamos la frase
+            setTimeout(() => {
+                if (!isWin) {
+                    updateTargetPhrase(); // Actualiza la frase cuando pierdes
+                }
+            }, 1000); // Retraso para que el mensaje se vea antes de actualizar la frase
         }
 
         function gameLoop() {
