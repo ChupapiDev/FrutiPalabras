@@ -1,0 +1,102 @@
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap');
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Orbitron', sans-serif;
+    background: #0d1117;
+    color: white;
+    overflow: hidden;
+}
+
+.game-container {
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+    position: relative;
+}
+
+.background {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(circle, rgba(10, 10, 30, 1) 0%, rgba(5, 5, 15, 1) 100%);
+}
+
+.top-section {
+    width: 90%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px;
+}
+
+.timer {
+    font-size: 1.5rem;
+    color: #00ffcc;
+}
+
+.health-bar {
+    width: 200px;
+    height: 15px;
+    background: rgba(255, 0, 0, 0.5);
+    border-radius: 8px;
+    overflow: hidden;
+    position: relative;
+}
+
+.health {
+    width: 100%;
+    height: 100%;
+    background: red;
+    transition: width 0.5s ease-in-out;
+}
+
+.battlefield {
+    width: 100%;
+    height: 50vh;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: relative;
+    padding: 20px;
+}
+
+.enemy-ship {
+    width: 120px;
+    height: 60px;
+    background: linear-gradient(45deg, #ff3333, #cc0000);
+    border-radius: 15px;
+    transition: transform 0.2s ease-in-out;
+}
+
+.cannon {
+    width: 80px;
+    height: 40px;
+    background: #888;
+    border-radius: 10px;
+    position: relative;
+}
+
+.code-box {
+    width: 80%;
+    max-width: 600px;
+    background: #222;
+    padding: 20px;
+    text-align: center;
+    border-radius: 15px;
+    font-size: 1.2rem;
+    color: gray;
+}
+
+#typed-text {
+    color: white;
+    font-weight: bold;
+}

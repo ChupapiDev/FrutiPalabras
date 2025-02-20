@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Juego de Amor</title>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            font-family: 'Arial', sans-serif;
+            background-color: #fce4ec;
+            touch-action: none;
+        }
+
+        .game-container {
+            width: 100vw;
+            height: 100vh;
+            background: linear-gradient(45deg, #ff6b6b, #ff8e8e, #ffb6b6);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .menu {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            color: white;
+            font-size: 2.5em;
+            text-shadow: 0 0 15px #ff69b4;
+            opacity: 1;
+            transition: opacity 0.5s ease;
+        }
+
+        .menu button {
+            background-color: #ff69b4;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            font-size: 1.5em;
+            margin: 20px;
+            cursor: pointer;
+            border-radius: 10px;
+            transition: background-color 0.3s ease;
+        }
+
+        .menu button:hover {
+            background-color: #ff4081;
+        }
+
+        .target-phrase {
+            position: absolute;
+            top: 10%;
+            width: 100%;
+            text-align: center;
+            font-size: 2.5em;
+            color: rgba(128, 128, 128, 0.7);
+            letter-spacing: 12px;
+            text-shadow: 0 0 15px #ff69b4;
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            z-index: 1;
+        }
+
+        .target-phrase span.collected {
+            color: #ffffff;
+            text-shadow: 0 0 20px #ff69b4;
+            transform: scale(1.2);
+            transition: all 0.3s ease;
+        }
+
+        .player {
+            width: 80px;
+            height: 80px;
+            background: url('Amorcito.png') no-repeat center center / cover;
+            position: absolute;
+            bottom: 10%;
+            left: 0;
+            border-radius: 15%;
+            box-shadow: 0 0 20px rgba(255, 105, 180, 0.7);
+        }
+
+        .letter {
+            position: absolute;
+            font-size: 2.5em;
+            color: white;
+            text-shadow: 0 0 10px #ff69b4;
+            animation: float 15s linear infinite;
+            user-select: none;
+        }
+
+        @keyframes float {
+            0% { top: -50px; }
+            100% { top: 80vh; }
+        }
+
+        .score-board {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            font-size: 2em;
+            color: #ffffff;
+            text-shadow: 0 0 10px #ff69b4;
+        }
+
+        .level {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            font-size: 2em;
+            color: #ffffff;
+            text-shadow: 0 0 10px #ff69b4;
+        }
+
+        .message {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 3em;
+            color: white;
+            text-align: center;
+            text-shadow: 0 0 20px #ff69b4;
+            opacity: 0;
+            animation: fadeInOut 2s;
+        }
+
+        @keyframes fadeInOut {
+            0%, 100% { opacity: 0; }
+            50% { opacity: 1; }
+        }
+
+        .particle {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            animation: particleEffect 1s forwards;
+        }
+
+        @keyframes particleEffect {
+            0% {
+                opacity: 1;
+                transform: scale(1) translateY(0) translateX(0);
+            }
+            100% {
+                opacity: 0;
+                transform: scale(0.5) translateY(-100px) translateX(100px);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .target-phrase {
+                font-size: 1.8em;
+            }
+
+            .score-board, .level {
+                font-size: 1.5em;
+            }
+
+            .player {
+                width: 60px;
+                height: 60px;
+            }
+
+            .menu button {
+                font-size: 1.2em;
+                padding: 12px 25px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="game-container" id="gameContainer">
+        <div class="score-board" id="scoreBoard">Puntaje: 0</div>
+        <div class="level" id="level">Nivel: 1</div>
+        <div class="menu" id="menu">
+            <div>¡Bienvenido al Juego de Amor!</div>
+            <button id="startBtn">Iniciar Juego</button>
+        </div>
+        <div class="target-phrase" id="targetPhrase"></div>
+        <div class="player" id="player"></div>
+    </div>
+
+    <audio id="bgMusic" src="cancion.mp3" preload="auto" loop></audio>
+    <audio id="catchSound" src="burbuja.mp3" preload="auto"></audio>
+
+    <script>
+        const phrases = [
+            'TeAmo',
+            'Frutillita',
+            'Princesa',
+            'MiSol',
+            'PreciosaMia'
+        ];
+        
+        let targetPhrase = '';
+        let currentIndex = 0;
+        let letters = [];
+        let letterSpeed = 2;
+        let score = 0;
+        let level = 1;
+        let gameStarted = false;
+        let playerX = 0;
+        let touchStartX = 0;
+
+        const startBtn = document.getElementById('startBtn');
+        const menu = document.getElementById('menu');
+        const targetPhraseDiv = document.getElementById('targetPhrase');
+        const player = document.getElementById('player');
+        const scoreBoard = document.getElementById('scoreBoard');
+        const levelDiv = document.getElementById('level');
+        const bgMusic = document.getElementById('bgMusic');
+        const catchSound = document.getElementById('catchSound');
+
+        startBtn.addEventListener('click', startGame);
+
+        function startGame() {
+            gameStarted = true;
+            menu.style.display = 'none';
+            bgMusic.play();
+            updateTargetPhrase();
+            gameLoop();
+            setInterval(createLetter, 2000);
+        }
+
+        function updateTargetPhrase() {
+            targetPhrase = phrases[Math.floor(Math.random() * phrases.length)];
+            targetPhraseDiv.innerHTML = targetPhrase.split('').map(char => 
+                `<span>${char === ' ' ? '&nbsp;' : char}</span>`
+            ).join('');
+            currentIndex = 0;
+        }
+
+        function createLetter() {
+            const letter = document.createElement('div');
+            letter.className = 'letter';
+            const remainingChars = targetPhrase.split('').filter((_, i) => 
+                !targetPhraseDiv.children[i].classList.contains('collected')
+            );
+            
+            if (remainingChars.length > 0) {
+                const randomChar = remainingChars[Math.floor(Math.random() * remainingChars.length)];
+                letter.textContent = randomChar === ' ' ? ' ' : randomChar; // Manejo de espacios
+                letter.style.left = Math.random() * (window.innerWidth - 50) + 'px';
+                gameContainer.appendChild(letter);
+                letters.push(letter);
+            }
+        }
+
+        function checkCollisions() {
+            const playerRect = player.getBoundingClientRect();
+            letters.forEach((letter, index) => {
+                const letterRect = letter.getBoundingClientRect();
+                
+                if (isColliding(playerRect, letterRect)) {
+                    if (letter.textContent.trim() === targetPhrase[currentIndex]) { // Usar trim() para ignorar espacios
+                        currentIndex++;
+                        score++;
+                        scoreBoard.textContent = `Puntaje: ${score}`;
+                        targetPhraseDiv.children[currentIndex - 1].classList.add('collected');
+                        letter.remove();
+                        letters.splice(index, 1);
+                        
+                        // Crear partículas y reproducir sonido
+                        createParticles(letter);
+                        catchSound.play();
+
+                        if (currentIndex === targetPhrase.length) {
+                            nextLevel();
+                        }
+                    } else {
+                        showMessage('¡Oh no! Intenta de nuevo ❤️', false);
+                        letter.remove();
+                        letters.splice(index, 1);
+                    }
+                }
+            });
+        }
+
+        function createParticles(letter) {
+            for (let i = 0; i < 20; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                particle.style.backgroundColor = `hsl(${Math.random() * 360}, 100%, 70%)`;
+                particle.style.left = letter.offsetLeft + Math.random() * 50 + 'px';
+                particle.style.top = letter.offsetTop + Math.random() * 50 + 'px';
+                gameContainer.appendChild(particle);
+
+                setTimeout(() => particle.remove(), 1000); // Eliminar partículas después de un tiempo
+            }
+        }
+
+        function nextLevel() {
+            level++;
+            levelDiv.textContent = `Nivel: ${level}`;
+            showMessage('¡Siguiente nivel! ❤️', true);
+            setTimeout(updateTargetPhrase, 2000);
+        }
+
+        function isColliding(rect1, rect2) {
+            return !(rect1.right < rect2.left || 
+                    rect1.left > rect2.right || 
+                    rect1.bottom < rect2.top || 
+                    rect1.top > rect2.bottom);
+        }
+
+        function showMessage(text, isWin) {
+            const msg = document.createElement('div');
+            msg.className = 'message';
+            msg.textContent = text;
+            gameContainer.appendChild(msg);
+            setTimeout(() => msg.remove(), 2000);
+        }
+
+        function gameLoop() {
+            if (!gameStarted) return;
+            
+            letters.forEach(letter => {
+                const currentTop = parseInt(letter.style.top) || -50;
+                letter.style.top = (currentTop + letterSpeed) + 'px';
+                
+                if (currentTop > window.innerHeight) {
+                    letter.remove();
+                    letters.splice(letters.indexOf(letter), 1);
+                }
+            });
+            
+            checkCollisions();
+            requestAnimationFrame(gameLoop);
+        }
+
+        document.addEventListener('touchstart', e => {
+            touchStartX = e.touches[0].clientX;
+            playerX = player.offsetLeft;
+        });
+
+        document.addEventListener('touchmove', e => {
+            e.preventDefault();
+            const touch = e.touches[0];
+            const newX = playerX + (touch.clientX - touchStartX);
+            const maxX = window.innerWidth - player.offsetWidth;
+            
+            player.style.left = `${Math.max(0, Math.min(maxX, newX))}px`;
+        });
+
+        document.addEventListener('keydown', e => {
+            const step = 30;
+            const maxX = window.innerWidth - player.offsetWidth;
+            
+            if (e.key === 'ArrowLeft') {
+                player.style.left = `${Math.max(0, player.offsetLeft - step)}px`;
+            } else if (e.key === 'ArrowRight') {
+                player.style.left = `${Math.min(maxX, player.offsetLeft + step)}px`;
+            }
+        });
+    </script>
+</body>
+</html>
